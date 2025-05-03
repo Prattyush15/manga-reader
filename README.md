@@ -32,17 +32,15 @@ Make sure you have the following installed:
 
 2. Install the dependencies:
    
-   '''bash
+   ```bash
    npm install
    # or
    yarn install
 
 ## Running the App Locally
-   Start the development server:
-   '''bash
+   Start the development server: ```bash
    npm run dev
-   # or
-   yarn dev
+   
 
 ## API Usage
 This project uses the public MangaDex API to fetch manga information, chapters, covers, and genres. No API key is required to access the public endpoints.
@@ -51,3 +49,5 @@ This project uses the public MangaDex API to fetch manga information, chapters, 
 If you add new image sources, update next.config.js to include their domains so that Next.js can properly optimize and serve the images.
 
 
+
+   
