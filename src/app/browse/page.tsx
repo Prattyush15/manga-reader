@@ -219,6 +219,9 @@ export default function BrowsePage() {
       {pickerOpen && (
         <ChapterPicker
           mangaId={pickerOpen}
+          mangaPlusUrl={
+            mangaResults.find((m) => m.id === pickerOpen)?.mangaPlusUrl
+          }
           onSelect={handleChapterSelect}
           onClose={() => setPickerOpen(null)}
         />

@@ -6,9 +6,10 @@ interface ChapterPickerProps {
   mangaId: string
   onSelect?: (chapterId: string) => void
   onClose: () => void
+  mangaPlusUrl?: string
 }
 
-export default function ChapterPicker({ mangaId, onSelect, onClose }: ChapterPickerProps) {
+export default function ChapterPicker({ mangaId, onSelect, onClose, mangaPlusUrl }: ChapterPickerProps) {
   const [chapters, setChapters] = useState<Chapter[]>([])
   const [loading, setLoading] = useState(true)
   const router = useRouter()
@@ -39,7 +40,26 @@ export default function ChapterPicker({ mangaId, onSelect, onClose }: ChapterPic
         {loading ? (
           <div className="text-center text-gray-500">Loading chapters...</div>
         ) : chapters.length === 0 ? (
-          <div className="text-center text-gray-500">No chapters found.</div>
+          <div className="text-center text-gray-500">
+            No chapters found.<br />
+            {mangaPlusUrl ? (
+              <div className="mt-4 flex flex-col items-center">
+                <span className="mb-2 text-black font-semibold">No chapters available on MangaDex. Read on MangaPlus instead:</span>
+                <a
+                  href={mangaPlusUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-pink-600 text-white px-4 py-2 rounded shadow hover:bg-pink-700 font-bold text-center"
+                >
+                  Read on MangaPlus
+                </a>
+              </div>
+            ) : (
+              <div className="mt-4 flex flex-col items-center">
+                <span className="mb-2 text-black font-semibold">No chapters available on MangaDex. Please check the official MangaPlus or VIZ site for this manga.</span>
+              </div>
+            )}
+          </div>
         ) : (
           <ul className="max-h-64 overflow-y-auto divide-y">
             {chapters.map((chapter) => (

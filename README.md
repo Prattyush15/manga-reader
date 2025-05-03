@@ -41,7 +41,6 @@ Make sure you have the following installed:
    Start the development server: 
    ```bash
    npm run dev
-   
 
 ## API Usage
 This project uses the public MangaDex API to fetch manga information, chapters, covers, and genres. No API key is required to access the public endpoints.

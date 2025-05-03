@@ -49,12 +49,13 @@ export async function fetchMangaChapters(mangaId: string): Promise<Chapter[]> {
     const res = await fetch(`https://api.mangadex.org/manga/${mangaId}/feed?limit=${limit}&offset=${offset}&translatedLanguage[]=en&order[chapter]=asc`)
     const data = await res.json()
     if (!data.data) break
-    // Only include English chapters with a chapter number
+    // Only include English chapters with a chapter number and with pages
     const batch = data.data
       .filter((c: any) =>
         c.attributes &&
         c.attributes.chapter &&
-        c.attributes.translatedLanguage?.includes('en')
+        c.attributes.translatedLanguage?.includes('en') &&
+        c.attributes.pages && c.attributes.pages > 0
       )
       .map((c: any) => ({
         id: c.id,
