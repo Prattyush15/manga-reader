@@ -3,7 +3,7 @@ import Link from 'next/link'
 import ChapterSelector from '@/components/ChapterSelector'
 import MangaReaderClient from '@/components/MangaReaderClient'
 import ScrollToTopOnMount from '@/components/ScrollToTopOnMount'
-import { useFavorites } from '@/hooks/useFavorites'
+import FavoriteButton from '@/components/FavoriteButton'
 import { useMemo } from 'react'
 
 interface ReaderPageProps {
@@ -11,14 +11,28 @@ interface ReaderPageProps {
 }
 
 async function fetchChapterInfo(chapterId: string) {
-  const res = await fetch(`https://api.mangadex.org/chapter/${chapterId}`)
-  const data = await res.json()
-  return data.data
+  try {
+    const res = await fetch(`https://api.mangadex.org/chapter/${chapterId}`, { cache: 'no-store' });
+    if (!res.ok) {
+      throw new Error('Failed to fetch chapter info');
+    }
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    return null;
+  }
 }
 
 export default async function ReaderPage({ params }: ReaderPageProps) {
   // Fetch current chapter info to get mangaId
   const chapterInfo = await fetchChapterInfo(params.chapterId)
+  if (!chapterInfo) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black text-red-500 text-2xl">
+        Failed to load chapter. Please try again later.
+      </div>
+    )
+  }
   const mangaId = chapterInfo?.relationships?.find((r: any) => r.type === 'manga')?.id
   const mangaTitle = chapterInfo?.relationships?.find((r: any) => r.type === 'manga')?.attributes?.title?.en || 'Manga'
   const mangaDescription = chapterInfo?.relationships?.find((r: any) => r.type === 'manga')?.attributes?.description?.en || ''
@@ -39,33 +53,6 @@ export default async function ReaderPage({ params }: ReaderPageProps) {
 
   const pages = await fetchChapterPages(params.chapterId)
 
-  // Favorite button logic (client only)
-  function FavoriteButton() {
-    const { isFavorite, addFavorite, removeFavorite } = useFavorites()
-    const favorited = useMemo(() => isFavorite(mangaId), [isFavorite, mangaId])
-    const handleFavorite = () => {
-      if (favorited) {
-        removeFavorite(mangaId)
-      } else {
-        addFavorite({ id: mangaId, title: mangaTitle, coverImage, description: mangaDescription })
-      }
-    }
-    return (
-      <button
-        aria-label={favorited ? 'Remove from favorites' : 'Add to favorites'}
-        onClick={handleFavorite}
-        className="ml-4 p-1 rounded-full bg-transparent hover:bg-green-600/20 transition"
-        style={{ lineHeight: 0 }}
-      >
-        {favorited ? (
-          <svg xmlns="http://www.w3.org/2000/svg" fill="#1db954" viewBox="0 0 24 24" width="28" height="28"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-        ) : (
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#1db954" strokeWidth="2" viewBox="0 0 24 24" width="28" height="28"><path d="M12.1 8.64l-.1.1-.11-.11C10.14 6.6 7.1 7.24 5.6 9.28c-1.5 2.04-1.1 5.12 1.4 7.05l5.1 4.55 5.1-4.55c2.5-1.93 2.9-5.01 1.4-7.05-1.5-2.04-4.54-2.68-6.4-.64z"/></svg>
-        )}
-      </button>
-    )
-  }
-
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center">
       <ScrollToTopOnMount />
@@ -79,10 +66,10 @@ export default async function ReaderPage({ params }: ReaderPageProps) {
             nextChapterId={nextChapter?.id}
           />
           {currentChapter && (
-            <span className="ml-2 text-green text-lg font-bold flex items-center">
-              {currentChapter.title || `Chapter ${currentChapter.chapter}`}
-              <FavoriteButton />
-            </span>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-bold text-white">{currentChapter.title || `Chapter ${currentChapter.chapter}`}</h1>
+              <FavoriteButton manga={{ id: mangaId, title: mangaTitle, coverImage, description: mangaDescription }} />
+            </div>
           )}
         </div>
         {pages.length === 0 ? (

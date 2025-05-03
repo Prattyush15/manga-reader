@@ -16,13 +16,34 @@ interface MangaReaderClientProps {
   nextChapterId?: string
 }
 
+const HORIZONTAL_KEY = 'manga-horizontal-view';
+const REMOVE_GAPS_KEY = 'manga-remove-gaps';
+
 export default function MangaReaderClient({ pages, chapters, currentChapterId, prevChapterId, nextChapterId }: MangaReaderClientProps) {
-  const [view, setView] = useState<'vertical' | 'horizontal'>('vertical')
+  const [view, setView] = useState<'vertical' | 'horizontal'>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(HORIZONTAL_KEY) === 'true' ? 'horizontal' : 'vertical';
+    }
+    return 'vertical';
+  });
   const [currentPage, setCurrentPage] = useState(0)
   const [showUpArrow, setShowUpArrow] = useState(false)
-  const [noGaps, setNoGaps] = useState(false)
+  const [noGaps, setNoGaps] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(REMOVE_GAPS_KEY) === 'true';
+    }
+    return false;
+  });
   const containerRef = useRef<HTMLDivElement>(null)
   const horizontalImgRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    localStorage.setItem(HORIZONTAL_KEY, (view === 'horizontal').toString());
+  }, [view]);
+
+  useEffect(() => {
+    localStorage.setItem(REMOVE_GAPS_KEY, noGaps.toString());
+  }, [noGaps]);
 
   // Show up arrow when scrolled down
   useEffect(() => {
