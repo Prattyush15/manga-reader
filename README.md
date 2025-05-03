@@ -37,8 +37,9 @@ Make sure you have the following installed:
    # or
    yarn install
 
-## Running the App Locally
-   Start the development server: ```bash
+3. Running the App Locally
+   Start the development server: 
+   ```bash
    npm run dev
    
 
