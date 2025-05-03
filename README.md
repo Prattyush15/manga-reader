@@ -1,50 +1,53 @@
 # Manga Reader
 
-A modern, full-featured manga reader web app built with Next.js and React. Browse, search, and read manga with a beautiful, dark-themed interface. Favorite your manga, pick chapters, and enjoy a seamless reading experience.
+Welcome to **Manga Reader**, a modern web app built with **Next.js** and **React** for reading manga online—completely ad-free. Search, explore, and read chapters with a smooth, dark-themed interface designed for manga fans.
 
 ## Features
-- Browse and search manga with filters (title, genres, etc.)
-- Read manga chapters in vertical or horizontal mode
-- Favorite manga and access them in a dedicated tab
-- Persistent favorites using localStorage
-- Chapter picker for quick navigation
-- Responsive, accessible, and modern UI
-- Uses the [MangaDex API](https://api.mangadex.org/) for manga data and images
+
+- Search and filter manga by title, genre, and more
+- Read chapters in vertical or horizontal mode
+- Favorite manga and access them anytime
+- Favorites are saved in your browser using localStorage
+- Quick chapter picker for easy navigation
+- Fully responsive design for desktop and mobile
+- Dark mode interface for comfortable reading
+- Uses the public [MangaDex API](https://api.mangadex.org/) to fetch data
 
 ## Getting Started
 
 ### Prerequisites
+
+Make sure you have the following installed:
+
 - [Node.js](https://nodejs.org/) (v18 or newer recommended)
 - [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
 
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/yourusername/manga-reader.git
    cd manga-reader
-   ```
 
-2. Install dependencies:
-   ```bash
+2. Install the dependencies:
+   
+   '''bash
    npm install
    # or
    yarn install
-   ```
 
-### Running the App Locally
-
-Start the development server:
-```bash
-npm run dev
-# or
-yarn dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser to use the app.
+## Running the App Locally
+   Start the development server:
+   '''bash
+   npm run dev
+   # or
+   yarn dev
 
 ## API Usage
-This project uses the public [MangaDex API](https://api.mangadex.org/) to fetch manga, chapters, covers, and genres. No API key is required for public endpoints.
+This project uses the public MangaDex API to fetch manga information, chapters, covers, and genres. No API key is required to access the public endpoints.
 
 ## Configuration
-If you add new image sources, update `next.config.js` to allow their domains for Next.js image optimization.
+If you add new image sources, update next.config.js to include their domains so that Next.js can properly optimize and serve the images.
+
+
