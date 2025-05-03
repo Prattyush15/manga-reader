@@ -20,7 +20,63 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #101a14;
+  color: #e5ffe1;
+  font-family: Inter, sans-serif;
+  transition: background 0.3s, color 0.3s;
+}
+
+nav {
+  background: #182820 !important;
+  color: #e5ffe1;
+  border-bottom: 1px solid #1db954;
+}
+
+a, .text-green {
+  color: #1db954;
+  transition: color 0.2s;
+}
+a:hover, .text-green:hover {
+  color: #23e06c;
+}
+
+button, .btn-green {
+  background: #1db954;
+  color: #101a14;
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  transition: background 0.2s, color 0.2s;
+}
+button:hover, .btn-green:hover {
+  background: #23e06c;
+  color: #101a14;
+}
+
+input, textarea {
+  background: #182820;
+  color: #e5ffe1;
+  border: 1px solid #1db954;
+  border-radius: 0.375rem;
+  padding: 0.5rem 1rem;
+  transition: border 0.2s, background 0.2s;
+}
+input:focus, textarea:focus {
+  border-color: #23e06c;
+  background: #101a14;
+}
+
+img {
+  background: #182820;
+  border-radius: 0.5rem;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  background: #182820;
+}
+::-webkit-scrollbar-thumb {
+  background: #1db954;
+  border-radius: 5px;
 }
