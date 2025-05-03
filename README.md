@@ -48,6 +48,3 @@ This project uses the public [MangaDex API](https://api.mangadex.org/) to fetch 
 
 ## Configuration
 If you add new image sources, update `next.config.js` to allow their domains for Next.js image optimization.
-
-## License
-MIT

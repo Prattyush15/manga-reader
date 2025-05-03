@@ -14,6 +14,7 @@ interface Manga {
   title: string
   coverImage: string
   description: string
+  mangaPlusUrl?: string
 }
 
 const SELECTED_GENRES_KEY = 'manga-selected-genres';
@@ -89,6 +90,7 @@ export default function BrowsePage() {
                 ? `https://uploads.mangadex.org/covers/${m.id}/${coverFile}.256.jpg`
                 : '',
               description: m.attributes.description.en || '',
+              mangaPlusUrl: m.attributes.mangaPlusUrl
             }
           })
         )
@@ -191,12 +193,23 @@ export default function BrowsePage() {
               coverImage={manga.coverImage}
               description={manga.description}
             />
-            <button
-              className="absolute bottom-4 right-4 bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700"
-              onClick={() => handleRead(manga.id)}
-            >
-              Read
-            </button>
+            {manga.mangaPlusUrl ? (
+              <a
+                href={manga.mangaPlusUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="absolute bottom-4 right-4 bg-pink-600 text-white px-4 py-2 rounded shadow hover:bg-pink-700 font-bold text-center"
+              >
+                Read on MangaPlus
+              </a>
+            ) : (
+              <button
+                className="absolute bottom-4 right-4 bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700"
+                onClick={() => handleRead(manga.id)}
+              >
+                Read
+              </button>
+            )}
           </div>
         ))}
       </div>

@@ -5,6 +5,7 @@ export interface Manga {
   title: string
   coverImage: string
   description: string
+  mangaPlusUrl?: string
 }
 
 export interface Chapter {
@@ -24,6 +25,7 @@ export async function fetchMangaList(query?: string): Promise<Manga[]> {
   return data.data
     .map((m: any) => {
       const coverFile = m.relationships.find((r: any) => r.type === 'cover_art')?.attributes?.fileName
+      const mangaPlusUrl = m.attributes.links?.mangaplus ? `https://mangaplus.shueisha.co.jp/titles/${m.attributes.links.mangaplus}` : undefined
       return {
         id: m.id,
         title: m.attributes.title.en || Object.values(m.attributes.title)[0],
@@ -31,6 +33,7 @@ export async function fetchMangaList(query?: string): Promise<Manga[]> {
           ? `https://uploads.mangadex.org/covers/${m.id}/${coverFile}.256.jpg`
           : '',
         description: m.attributes.description.en || '',
+        mangaPlusUrl,
       }
     })
     .filter((m: Manga) => m.coverImage && m.title && m.description)
