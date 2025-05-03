@@ -40,9 +40,10 @@ export async function fetchMangaChapters(mangaId: string): Promise<Chapter[]> {
   let chapters: Chapter[] = []
   let offset = 0
   let hasMore = true
-  // Fetch up to 1500 chapters (in batches of 100)
-  while (hasMore && offset < 1500) {
-    const res = await fetch(`https://api.mangadex.org/manga/${mangaId}/feed?limit=100&offset=${offset}&translatedLanguage[]=en&order[chapter]=asc`)
+  const limit = 100
+  // Fetch up to 5000 chapters (in batches of 100)
+  while (hasMore && offset < 5000) {
+    const res = await fetch(`https://api.mangadex.org/manga/${mangaId}/feed?limit=${limit}&offset=${offset}&translatedLanguage[]=en&order[chapter]=asc`)
     const data = await res.json()
     if (!data.data) break
     // Only include English chapters with a chapter number
@@ -61,6 +62,7 @@ export async function fetchMangaChapters(mangaId: string): Promise<Chapter[]> {
     chapters = chapters.concat(batch)
     hasMore = data.total > offset + data.data.length
     offset += data.data.length
+    if (data.data.length < limit) break // No more data
   }
   // Deduplicate by chapter number, keep the one with the most pages
   const deduped: { [chapter: string]: Chapter } = {}

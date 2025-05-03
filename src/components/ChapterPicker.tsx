@@ -35,7 +35,7 @@ export default function ChapterPicker({ mangaId, onSelect, onClose }: ChapterPic
         >
           ×
         </button>
-        <h2 className="text-xl font-bold mb-4">Select a Chapter</h2>
+        <h2 className="text-xl font-bold mb-4 text-black">Select a Chapter</h2>
         {loading ? (
           <div className="text-center text-gray-500">Loading chapters...</div>
         ) : chapters.length === 0 ? (
