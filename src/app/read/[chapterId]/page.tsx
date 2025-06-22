@@ -24,8 +24,10 @@ async function fetchChapterInfo(chapterId: string) {
 }
 
 export default async function ReaderPage({ params }: ReaderPageProps) {
+  const { chapterId } = params
+
   // Fetch current chapter info to get mangaId
-  const chapterInfo = await fetchChapterInfo(params.chapterId)
+  const chapterInfo = await fetchChapterInfo(chapterId)
   if (!chapterInfo) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black text-red-500 text-2xl">
@@ -46,12 +48,12 @@ export default async function ReaderPage({ params }: ReaderPageProps) {
   }
 
   // Find current, previous, and next chapter
-  const currentIdx = chapters.findIndex((c) => c.id === params.chapterId)
+  const currentIdx = chapters.findIndex((c) => c.id === chapterId)
   const prevChapter = currentIdx > 0 ? chapters[currentIdx - 1] : null
   const nextChapter = currentIdx >= 0 && currentIdx < chapters.length - 1 ? chapters[currentIdx + 1] : null
   const currentChapter = chapters[currentIdx]
 
-  const pages = await fetchChapterPages(params.chapterId)
+  const pages = await fetchChapterPages(chapterId)
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center">
@@ -61,7 +63,7 @@ export default async function ReaderPage({ params }: ReaderPageProps) {
           <Link href="/" className="text-green font-bold hover:underline self-start">← Home</Link>
           <ChapterSelector
             chapters={chapters}
-            currentChapterId={params.chapterId}
+            currentChapterId={chapterId}
             prevChapterId={prevChapter?.id}
             nextChapterId={nextChapter?.id}
           />
@@ -78,7 +80,7 @@ export default async function ReaderPage({ params }: ReaderPageProps) {
           <MangaReaderClient
             pages={pages}
             chapters={chapters}
-            currentChapterId={params.chapterId}
+            currentChapterId={chapterId}
             prevChapterId={prevChapter?.id}
             nextChapterId={nextChapter?.id}
           />
