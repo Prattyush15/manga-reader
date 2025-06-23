@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import MangaCard from '@/components/MangaCard'
 import MangaReader from '@/components/MangaReader'
 import ChapterPicker from '@/components/ChapterPicker'
-import { fetchMangaList, fetchChapterPages, Manga } from '@/services/mangaService'
+import { fetchMangaList, Manga } from '@/services/mangaService'
 
 export default function Home() {
   const [mangaList, setMangaList] = useState<Manga[]>([])
@@ -11,7 +11,6 @@ export default function Home() {
   const [pickerOpen, setPickerOpen] = useState(false)
   const [readerOpen, setReaderOpen] = useState(false)
   const [selectedMangaId, setSelectedMangaId] = useState<string | null>(null)
-  const [readerPages, setReaderPages] = useState<string[]>([])
   const [search, setSearch] = useState('')
 
   useEffect(() => {
@@ -28,14 +27,6 @@ export default function Home() {
   const handleRead = (mangaId: string) => {
     setSelectedMangaId(mangaId)
     setPickerOpen(true)
-  }
-
-  const handleChapterSelect = async (chapterId: string) => {
-    setPickerOpen(false)
-    setReaderPages([])
-    setReaderOpen(true)
-    const pages = await fetchChapterPages(chapterId)
-    setReaderPages(pages)
   }
 
   return (
@@ -86,12 +77,11 @@ export default function Home() {
         {pickerOpen && selectedMangaId && (
           <ChapterPicker
             mangaId={selectedMangaId}
-            onSelect={handleChapterSelect}
             onClose={() => setPickerOpen(false)}
           />
         )}
-        {readerOpen && readerPages.length > 0 && (
-          <MangaReader pages={readerPages} onClose={() => setReaderOpen(false)} />
+        {readerOpen && (
+          <MangaReader pages={[]} onClose={() => setReaderOpen(false)} />
         )}
       </div>
     </main>

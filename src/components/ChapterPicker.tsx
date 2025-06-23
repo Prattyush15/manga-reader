@@ -4,12 +4,11 @@ import { useRouter } from 'next/navigation'
 
 interface ChapterPickerProps {
   mangaId: string
-  onSelect?: (chapterId: string) => void
   onClose: () => void
   mangaPlusUrl?: string
 }
 
-export default function ChapterPicker({ mangaId, onSelect, onClose, mangaPlusUrl }: ChapterPickerProps) {
+export default function ChapterPicker({ mangaId, onClose, mangaPlusUrl }: ChapterPickerProps) {
   const [chapters, setChapters] = useState<Chapter[]>([])
   const [loading, setLoading] = useState(true)
   const router = useRouter()

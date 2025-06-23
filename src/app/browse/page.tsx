@@ -2,7 +2,6 @@
 import { useEffect, useState, useRef } from 'react'
 import MangaCard from '@/components/MangaCard'
 import ChapterPicker from '@/components/ChapterPicker'
-import { useRouter } from 'next/navigation'
 
 interface Genre {
   id: string
@@ -15,6 +14,41 @@ interface Manga {
   coverImage: string
   description: string
   mangaPlusUrl?: string
+}
+
+interface MangaDexTag {
+  id: string
+  type: string
+  attributes: {
+    name: {
+      en: string
+    }
+  }
+}
+
+interface MangaDexRelationship {
+  id: string
+  type: string
+  attributes?: {
+    [key: string]: string | number | boolean
+  }
+}
+
+interface MangaDexManga {
+  id: string
+  type: string
+  attributes: {
+    title: {
+      en?: string
+      [key: string]: string | undefined
+    }
+    description: {
+      en?: string
+      [key: string]: string | undefined
+    }
+    mangaPlusUrl?: string
+  }
+  relationships: MangaDexRelationship[]
 }
 
 const SELECTED_GENRES_KEY = 'manga-selected-genres';
@@ -35,14 +69,18 @@ export default function BrowsePage() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [pickerOpen, setPickerOpen] = useState<string | null>(null);
-  const router = useRouter();
 
-  // Fetch genres from MangaDex
+  // Fetch genres from our API route
   useEffect(() => {
-    fetch('https://api.mangadex.org/manga/tag')
+    fetch('/api/manga/tags')
       .then(res => res.json())
       .then(data => {
-        setGenres(data.data.map((g: any) => ({ id: g.id, name: g.attributes.name.en })))
+        if (data.data) {
+          setGenres(data.data.map((g: MangaDexTag) => ({ id: g.id, name: g.attributes.name.en })))
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching genres:', error)
       })
   }, [])
 
@@ -66,37 +104,43 @@ export default function BrowsePage() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [dropdownOpen]);
 
-  // Fetch manga results
+  // Fetch manga results using our API route
   useEffect(() => {
     setLoading(true)
     setError('')
-    let url = `https://api.mangadex.org/manga?limit=18&order[relevance]=desc&availableTranslatedLanguage[]=en&includes[]=cover_art`
-    if (search) url += `&title=${encodeURIComponent(search)}`
-    if (selectedGenres.length > 0) {
-      selectedGenres.forEach((id) => {
-        url += `&includedTags[]=${id}`
-      })
-    }
-    fetch(url)
+    
+    const params = new URLSearchParams()
+    params.set('limit', '18')
+    if (search) params.set('query', search)
+    selectedGenres.forEach((id) => params.append('genre', id))
+    
+    fetch(`/api/manga?${params.toString()}`)
       .then(res => res.json())
       .then(data => {
-        setMangaResults(
-          data.data.map((m: any) => {
-            const coverFile = m.relationships.find((r: any) => r.type === 'cover_art')?.attributes?.fileName
-            return {
-              id: m.id,
-              title: m.attributes.title.en || Object.values(m.attributes.title)[0],
-              coverImage: coverFile
-                ? `https://uploads.mangadex.org/covers/${m.id}/${coverFile}.256.jpg`
-                : '',
-              description: m.attributes.description.en || '',
-              mangaPlusUrl: m.attributes.mangaPlusUrl
-            }
-          })
-        )
+        if (data.error) {
+          throw new Error(data.error)
+        }
+        
+        if (data.data) {
+          setMangaResults(
+            data.data.map((m: MangaDexManga) => {
+              const coverFile = m.relationships.find((r: MangaDexRelationship) => r.type === 'cover_art')?.attributes?.fileName
+              return {
+                id: m.id,
+                title: m.attributes.title.en || Object.values(m.attributes.title)[0] || 'Untitled',
+                coverImage: coverFile
+                  ? `https://uploads.mangadex.org/covers/${m.id}/${coverFile}.256.jpg`
+                  : '',
+                description: m.attributes.description.en || '',
+                mangaPlusUrl: m.attributes.mangaPlusUrl
+              }
+            })
+          )
+        }
         setLoading(false)
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error('Fetch error:', error)
         setError('Failed to fetch manga. Please try again.')
         setLoading(false)
       })
@@ -110,11 +154,6 @@ export default function BrowsePage() {
 
   const handleRead = (mangaId: string) => {
     setPickerOpen(mangaId);
-  };
-
-  const handleChapterSelect = (chapterId: string) => {
-    setPickerOpen(null);
-    router.push(`/read/${chapterId}`);
   };
 
   return (
@@ -222,7 +261,6 @@ export default function BrowsePage() {
           mangaPlusUrl={
             mangaResults.find((m) => m.id === pickerOpen)?.mangaPlusUrl
           }
-          onSelect={handleChapterSelect}
           onClose={() => setPickerOpen(null)}
         />
       )}

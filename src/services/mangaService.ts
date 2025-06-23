@@ -12,19 +12,42 @@ export interface Chapter {
   id: string
   title: string
   chapter: string
-  pages?: number
+  pages: number
+}
+
+interface MangaDexRelationship {
+  id: string
+  type: string
+  attributes?: {
+    fileName?: string
+  }
+}
+
+interface MangaDexManga {
+  id:string
+  attributes: {
+    title: { en?: string, [key: string]: string | undefined }
+    description: { en?: string }
+    links?: { mangaplus?: string }
+  }
+  relationships: MangaDexRelationship[]
 }
 
 export async function fetchMangaList(query?: string): Promise<Manga[]> {
-  let url = 'https://api.mangadex.org/manga?limit=12&order[followedCount]=desc&includes[]=cover_art&availableTranslatedLanguage[]=en'
-  if (query) {
-    url += `&title=${encodeURIComponent(query)}`
-  }
-  const res = await fetch(url)
+  const params = new URLSearchParams()
+  params.set('limit', '12')
+  if (query) params.set('query', query)
+
+  const res = await fetch(`/api/manga?${params.toString()}`)
   const data = await res.json()
+  
+  if (data.error) {
+    throw new Error(data.error)
+  }
+  
   return data.data
-    .map((m: any) => {
-      const coverFile = m.relationships.find((r: any) => r.type === 'cover_art')?.attributes?.fileName
+    .map((m: MangaDexManga) => {
+      const coverFile = m.relationships.find((r) => r.type === 'cover_art')?.attributes?.fileName
       const mangaPlusUrl = m.attributes.links?.mangaplus ? `https://mangaplus.shueisha.co.jp/titles/${m.attributes.links.mangaplus}` : undefined
       return {
         id: m.id,
@@ -40,44 +63,14 @@ export async function fetchMangaList(query?: string): Promise<Manga[]> {
 }
 
 export async function fetchMangaChapters(mangaId: string): Promise<Chapter[]> {
-  let chapters: Chapter[] = []
-  let offset = 0
-  let hasMore = true
-  const limit = 100
-  // Fetch up to 5000 chapters (in batches of 100)
-  while (hasMore && offset < 5000) {
-    const res = await fetch(`https://api.mangadex.org/manga/${mangaId}/feed?limit=${limit}&offset=${offset}&translatedLanguage[]=en&order[chapter]=asc`)
-    const data = await res.json()
-    if (!data.data) break
-    // Only include English chapters with a chapter number and with pages
-    const batch = data.data
-      .filter((c: any) =>
-        c.attributes &&
-        c.attributes.chapter &&
-        c.attributes.translatedLanguage?.includes('en') &&
-        c.attributes.pages && c.attributes.pages > 0
-      )
-      .map((c: any) => ({
-        id: c.id,
-        title: c.attributes.title || `Chapter ${c.attributes.chapter}`,
-        chapter: c.attributes.chapter,
-        pages: c.attributes.pages || 0,
-      }))
-    chapters = chapters.concat(batch)
-    hasMore = data.total > offset + data.data.length
-    offset += data.data.length
-    if (data.data.length < limit) break // No more data
+  const res = await fetch(`/api/manga/${mangaId}/chapters`)
+  const data = await res.json()
+  
+  if (data.error) {
+    throw new Error(data.error)
   }
-  // Deduplicate by chapter number, keep the one with the most pages
-  const deduped: { [chapter: string]: Chapter } = {}
-  for (const ch of chapters) {
-    if (!ch.chapter) continue
-    if (!deduped[ch.chapter] || (ch.pages || 0) > (deduped[ch.chapter].pages || 0)) {
-      deduped[ch.chapter] = ch
-    }
-  }
-  // Sort by chapter number (as float)
-  return Object.values(deduped).sort((a, b) => parseFloat(a.chapter) - parseFloat(b.chapter))
+  
+  return data.chapters || []
 }
 
 export async function fetchChapterPages(chapterId: string): Promise<string[]> {

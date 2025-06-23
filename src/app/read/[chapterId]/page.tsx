@@ -4,10 +4,13 @@ import ChapterSelector from '@/components/ChapterSelector'
 import MangaReaderClient from '@/components/MangaReaderClient'
 import ScrollToTopOnMount from '@/components/ScrollToTopOnMount'
 import FavoriteButton from '@/components/FavoriteButton'
-import { useMemo } from 'react'
 
-interface ReaderPageProps {
-  params: { chapterId: string }
+interface MangaDexRelationship {
+  id: string
+  type: string
+  attributes?: {
+    [key: string]: string | number | boolean
+  }
 }
 
 async function fetchChapterInfo(chapterId: string) {
@@ -18,13 +21,17 @@ async function fetchChapterInfo(chapterId: string) {
     }
     const data = await res.json();
     return data.data;
-  } catch (error) {
+  } catch {
     return null;
   }
 }
 
-export default async function ReaderPage({ params }: ReaderPageProps) {
-  const { chapterId } = params
+export default async function ReaderPage({
+  params,
+}: {
+  params: Promise<{ chapterId: string }>
+}) {
+  const { chapterId } = await params
 
   // Fetch current chapter info to get mangaId
   const chapterInfo = await fetchChapterInfo(chapterId)
@@ -35,10 +42,10 @@ export default async function ReaderPage({ params }: ReaderPageProps) {
       </div>
     )
   }
-  const mangaId = chapterInfo?.relationships?.find((r: any) => r.type === 'manga')?.id
-  const mangaTitle = chapterInfo?.relationships?.find((r: any) => r.type === 'manga')?.attributes?.title?.en || 'Manga'
-  const mangaDescription = chapterInfo?.relationships?.find((r: any) => r.type === 'manga')?.attributes?.description?.en || ''
-  const coverFile = chapterInfo?.relationships?.find((r: any) => r.type === 'cover_art')?.attributes?.fileName
+  const mangaId = chapterInfo?.relationships?.find((r: MangaDexRelationship) => r.type === 'manga')?.id
+  const mangaTitle = chapterInfo?.relationships?.find((r: MangaDexRelationship) => r.type === 'manga')?.attributes?.title?.en || 'Manga'
+  const mangaDescription = chapterInfo?.relationships?.find((r: MangaDexRelationship) => r.type === 'manga')?.attributes?.description?.en || ''
+  const coverFile = chapterInfo?.relationships?.find((r: MangaDexRelationship) => r.type === 'cover_art')?.attributes?.fileName
   const coverImage = coverFile && mangaId ? `https://uploads.mangadex.org/covers/${mangaId}/${coverFile}.256.jpg` : ''
 
   // Fetch all chapters for this manga

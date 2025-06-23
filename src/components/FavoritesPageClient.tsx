@@ -3,12 +3,10 @@ import { useFavorites } from '@/hooks/useFavorites';
 import MangaCard from '@/components/MangaCard';
 import { useState, useEffect } from 'react';
 import ChapterPicker from '@/components/ChapterPicker';
-import { useRouter } from 'next/navigation';
 
 export default function FavoritesPageClient() {
   const { favorites } = useFavorites();
   const [pickerOpen, setPickerOpen] = useState<string | null>(null);
-  const router = useRouter();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -17,11 +15,6 @@ export default function FavoritesPageClient() {
 
   const handleRead = (mangaId: string) => {
     setPickerOpen(mangaId);
-  };
-
-  const handleChapterSelect = (chapterId: string) => {
-    setPickerOpen(null);
-    router.push(`/read/${chapterId}`);
   };
 
   if (!mounted) {
@@ -56,7 +49,6 @@ export default function FavoritesPageClient() {
       {pickerOpen && (
         <ChapterPicker
           mangaId={pickerOpen}
-          onSelect={handleChapterSelect}
           onClose={() => setPickerOpen(null)}
         />
       )}
