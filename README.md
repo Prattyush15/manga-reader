@@ -1,25 +1,28 @@
 # Manga Reader
 
-Welcome to **Manga Reader**, a modern web app built with **Next.js** and **React** for reading manga online—completely ad-free. Search, explore, and read chapters with a smooth, dark-themed interface designed for manga fans.
+Welcome to [Manga Reader](https://manga-reader-rose.vercel.app/), a modern, ad-free web app built with Next.js and React for reading manga online. Search, explore, and read chapters with a fast, dark-themed interface designed for manga fans.
+
+## Live Site
+
+Visit the app: [https://manga-reader-rose.vercel.app/](https://manga-reader-rose.vercel.app/)
 
 ## Features
 
-- Search and filter manga by title, genre, and more
-- Read chapters in vertical or horizontal mode
-- Favorite manga and access them anytime
-- Favorites are saved in your browser using localStorage
-- Quick chapter picker for easy navigation
-- Fully responsive design for desktop and mobile
-- Dark mode interface for comfortable reading
+- Search and filter manga by title, genre, and more  
+- Read chapters in vertical or horizontal mode  
+- Favorite manga and access them anytime (saved in your browser using localStorage)  
+- Quick chapter picker for easy navigation  
+- Fully responsive design for desktop and mobile  
+- Dark mode interface for comfortable reading  
 - Uses the public [MangaDex API](https://api.mangadex.org/) to fetch data
 
-## Getting Started
+## Getting Started (Local Development)
 
 ### Prerequisites
 
 Make sure you have the following installed:
 
-- [Node.js](https://nodejs.org/) (v18 or newer recommended)
+- [Node.js](https://nodejs.org/) (version 18 or newer recommended)  
 - [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
 
 ### Installation
