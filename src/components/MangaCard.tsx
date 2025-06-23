@@ -13,54 +13,85 @@ interface MangaCardProps {
 
 export default function MangaCard({ id, title, coverImage, description, rating, status }: MangaCardProps) {
   const { isFavorite, addFavorite, removeFavorite } = useFavorites()
-  const favorited = useMemo(() => isFavorite(id), [isFavorite, id])
 
-  const handleFavorite = (e: React.MouseEvent) => {
+  const favManga = useMemo(() => ({
+    id,
+    title,
+    coverImage,
+    description
+  }), [id, title, coverImage, description])
+
+  const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation()
-    e.preventDefault()
-    if (favorited) {
+    if (isFavorite(id)) {
       removeFavorite(id)
     } else {
-      addFavorite({ id, title, coverImage, description })
+      addFavorite(favManga)
     }
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 relative">
-      <button
-        aria-label={favorited ? 'Remove from favorites' : 'Add to favorites'}
-        onClick={handleFavorite}
-        className="absolute top-2 right-2 z-10 rounded-full bg-transparent hover:ring-2 hover:ring-green-400 focus:ring-2 focus:ring-green-400 transition"
-        style={{ padding: 0, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 0, background: 'transparent' }}
-      >
-        {favorited ? (
-          <svg xmlns="http://www.w3.org/2000/svg" fill="#1db954" viewBox="0 0 24 24" width="24" height="24" style={{ display: 'block' }}><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-        ) : (
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#1db954" strokeWidth="2" viewBox="0 0 24 24" width="24" height="24" style={{ display: 'block' }}><path d="M12.1 8.64l-.1.1-.11-.11C10.14 6.6 7.1 7.24 5.6 9.28c-1.5 2.04-1.1 5.12 1.4 7.05l5.1 4.55 5.1-4.55c2.5-1.93 2.9-5.01 1.4-7.05-1.5-2.04-4.54-2.68-6.4-.64z"/></svg>
-        )}
-      </button>
-      <div className="relative h-64">
+    <div className="group relative">
+      {/* Cover Image */}
+      <div className="relative aspect-[3/4] overflow-hidden rounded-xl">
         <Image
           src={coverImage}
           alt={title}
           fill
-          className="object-cover"
+          className="object-cover transition-transform duration-300 group-hover:scale-110"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
         />
-      </div>
-      <div className="p-4">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
-        {rating && (
-          <div className="flex items-center mb-2">
-            <span className="text-yellow-500 mr-1">★</span>
-            <span className="text-gray-600">{rating.toFixed(1)}</span>
+        
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        
+        {/* Favorite Button */}
+        <button
+          onClick={handleFavoriteClick}
+          className="absolute top-3 right-3 p-2 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 hover:bg-black/70 transition-all duration-200 transform hover:scale-110"
+        >
+          <svg 
+            className={`h-5 w-5 transition-colors duration-200 ${
+              isFavorite(id) ? 'text-red-500 fill-current' : 'text-white'
+            }`} 
+            fill={isFavorite(id) ? 'currentColor' : 'none'} 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        </button>
+
+        {/* Status Badge */}
+        {status && (
+          <div className="absolute top-3 left-3">
+            <span className="inline-block bg-green-500/90 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1 rounded-full border border-green-400/30">
+              {status}
+            </span>
           </div>
         )}
-        {status && (
-          <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mb-2">
-            {status}
-          </span>
+
+        {/* Rating */}
+        {rating && (
+          <div className="absolute bottom-3 left-3">
+            <div className="flex items-center space-x-1 bg-black/50 backdrop-blur-sm rounded-full px-2 py-1 border border-white/20">
+              <svg className="h-4 w-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+              <span className="text-white text-sm font-medium">{rating.toFixed(1)}</span>
+            </div>
+          </div>
         )}
-        <p className="text-gray-600 text-sm line-clamp-3">{description}</p>
+      </div>
+
+      {/* Content */}
+      <div className="p-4 space-y-3">
+        <h3 className="text-lg font-bold text-white line-clamp-2 group-hover:text-blue-400 transition-colors duration-200">
+          {title}
+        </h3>
+        <p className="text-gray-400 text-sm line-clamp-3 leading-relaxed">
+          {description}
+        </p>
       </div>
     </div>
   )

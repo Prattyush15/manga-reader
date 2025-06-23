@@ -157,104 +157,161 @@ export default function BrowsePage() {
   };
 
   return (
-    <main className="min-h-screen bg-black text-white flex flex-col items-center py-8">
-      <h1 className="text-3xl font-bold mb-8">Browse Manga</h1>
-      <div className="w-full max-w-3xl flex flex-col gap-6 mb-8">
-        <input
-          type="text"
-          placeholder="Search manga..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="w-full px-4 py-2 rounded bg-[#182820] border border-green-600 text-green focus:outline-none focus:ring-2 focus:ring-green-400"
-        />
-        <div>
-          <label className="block mb-2 text-green font-semibold">Genres:</label>
-          <div className="relative" ref={dropdownRef}>
-            <button
-              type="button"
-              className="px-4 py-2 rounded bg-green-700 text-white font-bold border border-green-600 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400"
-              onClick={() => setDropdownOpen((open) => !open)}
-            >
-              Select Genres
-            </button>
-            {dropdownOpen && (
-              <div className="absolute z-20 mt-2 bg-[#101a14] border border-green-700 rounded shadow-lg p-4 flex flex-wrap gap-2 max-h-72 overflow-y-auto min-w-[250px]">
-                {genres.map((genre) => (
-                  <button
-                    key={genre.id}
-                    type="button"
-                    className={`px-3 py-1 rounded-full text-sm font-bold transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-yellow-400
-                      ${selectedGenres.includes(genre.id)
-                        ? 'bg-yellow-400 text-black border-2 border-yellow-700 scale-105'
-                        : 'bg-[#232d23] text-green-400 border border-green-700 hover:bg-green-700/30 hover:scale-105'}
-                    `}
-                    style={{ transition: 'all 0.15s' }}
-                    onClick={() => handleGenreChange(genre.id)}
-                  >
-                    {genre.name}
-                  </button>
-                ))}
+    <main className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
+            Browse Manga
+          </h1>
+          <p className="text-xl text-gray-400">
+            Discover your next favorite manga
+          </p>
+        </div>
+
+        {/* Search and Filters */}
+        <div className="max-w-4xl mx-auto mb-12 space-y-6">
+          {/* Search Bar */}
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <input
+              type="text"
+              placeholder="Search manga by title..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="w-full pl-12 pr-4 py-4 bg-slate-800/80 backdrop-blur-sm border border-slate-700 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+            />
+          </div>
+
+          {/* Genre Filter */}
+          <div className="space-y-4">
+            <label className="block text-lg font-semibold text-white">Filter by Genres:</label>
+            <div className="relative" ref={dropdownRef}>
+              <button
+                type="button"
+                className="w-full sm:w-auto px-6 py-3 bg-slate-800/80 backdrop-blur-sm border border-slate-700 rounded-xl text-white font-medium hover:bg-slate-700/80 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 flex items-center justify-between min-w-[200px]"
+                onClick={() => setDropdownOpen((open) => !open)}
+              >
+                <span>Select Genres</span>
+                <svg className={`w-5 h-5 transition-transform duration-200 ${dropdownOpen ? 'transform rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {dropdownOpen && (
+                <div className="absolute z-20 mt-2 w-full sm:w-96 bg-slate-800/95 backdrop-blur-sm border border-slate-700 rounded-xl shadow-2xl p-4 max-h-80 overflow-y-auto">
+                  <div className="grid grid-cols-2 gap-3">
+                    {genres.map((genre) => (
+                      <button
+                        key={genre.id}
+                        type="button"
+                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-left ${
+                          selectedGenres.includes(genre.id)
+                            ? 'bg-blue-600 text-white border border-blue-500 shadow-lg transform scale-105'
+                            : 'bg-slate-700/50 text-gray-300 border border-slate-600 hover:bg-slate-600/50 hover:border-slate-500'
+                        }`}
+                        onClick={() => handleGenreChange(genre.id)}
+                      >
+                        {genre.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {/* Selected Genres */}
+            {selectedGenres.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {selectedGenres.map((id) => {
+                  const genre = genres.find((g) => g.id === id)
+                  if (!genre) return null
+                  return (
+                    <span key={id} className="flex items-center bg-blue-600/20 border border-blue-500/30 text-blue-300 font-medium px-4 py-2 rounded-full backdrop-blur-sm">
+                      {genre.name}
+                      <button
+                        className="ml-2 text-blue-300 hover:text-red-400 font-bold focus:outline-none transition-colors"
+                        onClick={() => handleGenreChange(id)}
+                        aria-label={`Remove ${genre.name}`}
+                        type="button"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  )
+                })}
               </div>
             )}
           </div>
-          {/* Selected genres as chips */}
-          {selectedGenres.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-3">
-              {selectedGenres.map((id) => {
-                const genre = genres.find((g) => g.id === id)
-                if (!genre) return null
-                return (
-                  <span key={id} className="flex items-center bg-yellow-400 text-black font-bold px-3 py-1 rounded-full border-2 border-yellow-700">
-                    {genre.name}
-                    <button
-                      className="ml-2 text-black hover:text-red-600 font-bold focus:outline-none"
-                      onClick={() => handleGenreChange(id)}
-                      aria-label={`Remove ${genre.name}`}
-                      type="button"
-                    >
-                      ×
-                    </button>
-                  </span>
-                )
-              })}
+        </div>
+
+        {/* Results */}
+        <div className="space-y-8">
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="flex flex-col items-center space-y-4">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                <p className="text-gray-400">Loading manga...</p>
+              </div>
+            </div>
+          ) : error ? (
+            <div className="text-center py-20">
+              <div className="text-red-400 text-lg mb-4">⚠️ {error}</div>
+              <button 
+                onClick={() => window.location.reload()} 
+                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors"
+              >
+                Try Again
+              </button>
+            </div>
+          ) : mangaResults.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {mangaResults.map((manga) => (
+                <div key={manga.id} className="group relative">
+                  <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl overflow-hidden border border-slate-700/50 hover:border-slate-600 transition-all duration-300 hover:transform hover:scale-105">
+                    <MangaCard
+                      id={manga.id}
+                      title={manga.title}
+                      coverImage={manga.coverImage}
+                      description={manga.description}
+                    />
+                    <div className="p-4">
+                      {manga.mangaPlusUrl ? (
+                        <a
+                          href={manga.mangaPlusUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full bg-gradient-to-r from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-105 text-center block"
+                        >
+                          Read on MangaPlus
+                        </a>
+                      ) : (
+                        <button
+                          className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-105"
+                          onClick={() => handleRead(manga.id)}
+                        >
+                          Start Reading
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-20">
+              <div className="text-6xl mb-4">🔍</div>
+              <p className="text-gray-400 text-lg">No manga found</p>
+              <p className="text-gray-500 text-sm mt-2">Try adjusting your search or genre filters</p>
             </div>
           )}
         </div>
       </div>
-      {loading && <div className="text-green text-lg">Loading manga...</div>}
-      {error && <div className="text-red-400 text-lg">{error}</div>}
-      <div className="w-full max-w-5xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {mangaResults.map((manga) => (
-          <div key={manga.id} className="relative">
-            <MangaCard
-              id={manga.id}
-              title={manga.title}
-              coverImage={manga.coverImage}
-              description={manga.description}
-            />
-            {manga.mangaPlusUrl ? (
-              <a
-                href={manga.mangaPlusUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="absolute bottom-4 right-4 bg-pink-600 text-white px-4 py-2 rounded shadow hover:bg-pink-700 font-bold text-center"
-              >
-                Read on MangaPlus
-              </a>
-            ) : (
-              <button
-                className="absolute bottom-4 right-4 bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700"
-                onClick={() => handleRead(manga.id)}
-              >
-                Read
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
-      {!loading && mangaResults.length === 0 && (
-        <div className="text-green text-lg mt-8">No manga found. Try a different search or genre.</div>
-      )}
+
       {pickerOpen && (
         <ChapterPicker
           mangaId={pickerOpen}
