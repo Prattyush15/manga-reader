@@ -126,19 +126,6 @@ src/
 | `/api/manga/tags` | Get available genres |
 | `/api/manga/[id]/chapters` | Get chapters for a manga |
 
-## Key Features
-
-### Smart Filtering
-- Automatically filters out manga without English chapters
-- Fetches 2x requested amount to account for filtering
-- Only shows readable content to users
-
-### Responsive Design
-- Mobile-first approach
-- Grid layouts that adapt to screen size
-- Touch-friendly interface for mobile reading
-- Optimized typography for readability
-
 ## API Integration
 
 This app uses the **MangaDex API** to fetch:
