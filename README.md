@@ -1,55 +1,153 @@
 # Manga Reader
 
-Welcome to [Manga Reader](https://manga-reader-rose.vercel.app/), a modern, ad-free web app built with Next.js and React for reading manga online. Search, explore, and read chapters with a fast, dark-themed interface designed for manga fans.
+A modern manga reading web application built with Next.js 15, React, and TypeScript. Features a glassmorphism design, advanced filtering, and seamless reading experience.
 
 ## Live Site
 
-Visit the app: [https://manga-reader-rose.vercel.app/](https://manga-reader-rose.vercel.app/)
+**[Visit Manga Reader](https://manga-reader-rose.vercel.app/)**
 
 ## Features
 
-- Search and filter manga by title, genre, and more  
-- Read chapters in vertical or horizontal mode  
-- Favorite manga and access them anytime (saved in your browser using localStorage)  
-- Quick chapter picker for easy navigation  
-- Fully responsive design for desktop and mobile  
-- Dark mode interface for comfortable reading  
-- Uses the public [MangaDex API](https://api.mangadex.org/) to fetch data
+### Modern Design
+- Glassmorphism UI with gradient backgrounds and backdrop blur effects
+- Dark theme optimized for comfortable reading
+- Responsive design that works on all devices
+- Smooth animations and hover effects
 
-## Getting Started (Local Development)
+### Reading Experience
+- Chapter picker with intuitive navigation
+- High-quality image loading with Next.js Image optimization
+- Page-by-page reading with smooth transitions
+- Chapter navigation (previous/next) with keyboard shortcuts
+- Automatic chapter filtering - only shows manga with available English chapters
+
+### Discovery & Search
+- Advanced search by title with real-time results
+- Genre filtering with multi-select dropdown
+- Featured manga curated selection on homepage
+- Smart filtering excludes manga without readable content
+- Persistent genre preferences saved in localStorage
+
+### Personal Collection
+- Favorites system to save your favorite manga
+- Persistent storage using localStorage
+- Beautiful favorites page with collection stats
+- One-click favoriting from any manga card
+
+### Performance
+- Server-side rendering with Next.js App Router
+- Optimized API routes with retry logic and error handling
+- Image optimization with Next.js Image component
+- Fast loading with efficient data fetching
+- Mobile-optimized for reading on any device
+
+## Tech Stack
+
+- **Framework:** Next.js 15 (App Router)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **UI Components:** Custom React components
+- **Data Source:** MangaDex API
+- **Deployment:** Vercel
+- **State Management:** React Hooks + localStorage
+- **Image Optimization:** Next.js Image
+
+## Getting Started
 
 ### Prerequisites
 
-Make sure you have the following installed:
-
-- [Node.js](https://nodejs.org/) (version 18 or newer recommended)  
-- [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
+- Node.js 18+
+- npm or yarn
 
 ### Installation
 
 1. Clone the repository:
-
    ```bash
-   git clone https://github.com/yourusername/manga-reader.git
+   git clone https://github.com/Prattyush15/manga-reader.git
    cd manga-reader
+   ```
 
-2. Install the dependencies:
-   
+2. Install dependencies:
    ```bash
    npm install
    # or
    yarn install
+   ```
 
-3. Running the App Locally
-   Start the development server: 
+3. Start development server:
    ```bash
    npm run dev
+   # or
+   yarn dev
+   ```
 
-## API Usage
-This project uses the public MangaDex API to fetch manga information, chapters, covers, and genres. No API key is required to access the public endpoints.
+4. Open your browser:
+   ```
+   http://localhost:3000
+   ```
 
-## Configuration
-If you add new image sources, update next.config.js to include their domains so that Next.js can properly optimize and serve the images.
+### Build for Production
+
+```bash
+npm run build
+npm start
+```
+
+## Project Structure
+
+```
+src/
+├── app/                    # Next.js App Router pages
+│   ├── api/               # API routes
+│   │   └── manga/         # Manga-related endpoints
+│   │   └── manga/         # Manga-related endpoints
+│   ├── browse/            # Browse page
+│   ├── favorites/         # Favorites page
+│   ├── read/              # Chapter reading page
+│   └── page.tsx           # Homepage
+├── components/            # Reusable React components
+│   ├── MangaCard.tsx      # Manga display card
+│   ├── ChapterPicker.tsx  # Chapter selection modal
+│   ├── FavoriteButton.tsx # Favorite toggle button
+│   └── ...
+├── hooks/                 # Custom React hooks
+│   └── useFavorites.ts    # Favorites management
+├── services/              # External API services
+│   └── mangaService.ts    # MangaDex API integration
+└── types/                 # TypeScript type definitions
+```
+
+## API Endpoints
+
+| Endpoint | Description |
+|----------|-------------|
+| `/api/manga` | Search and filter manga |
+| `/api/manga/featured` | Get featured manga |
+| `/api/manga/tags` | Get available genres |
+| `/api/manga/[id]/chapters` | Get chapters for a manga |
+
+## Key Features
+
+### Smart Filtering
+- Automatically filters out manga without English chapters
+- Fetches 2x requested amount to account for filtering
+- Only shows readable content to users
+
+### Responsive Design
+- Mobile-first approach
+- Grid layouts that adapt to screen size
+- Touch-friendly interface for mobile reading
+- Optimized typography for readability
+
+## API Integration
+
+This app uses the **MangaDex API** to fetch:
+- Manga metadata and covers
+- Chapter information and pages
+- Genre tags and filtering options
+- Search results and featured content
+
+No API key required, it uses public endpoints with proper rate limiting and error handling.
 
 
 

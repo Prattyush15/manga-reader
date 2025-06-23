@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+interface MangaDexChapter {
+  attributes: {
+    chapter?: string
+    translatedLanguage?: string[]
+    pages?: number
+  }
+}
+
 // Helper function to retry API calls with exponential backoff
 async function fetchWithRetry(url: string, options: RequestInit, maxRetries = 2): Promise<Response> {
   for (let i = 0; i <= maxRetries; i++) {
@@ -54,7 +62,7 @@ async function hasAvailableChapters(mangaId: string): Promise<boolean> {
     
     // Check if there are any chapters with valid chapter numbers and pages
     if (data.data && data.data.length > 0) {
-      return data.data.some((chapter: any) => 
+      return data.data.some((chapter: MangaDexChapter) => 
         chapter.attributes && 
         chapter.attributes.chapter && 
         chapter.attributes.translatedLanguage?.includes('en') &&

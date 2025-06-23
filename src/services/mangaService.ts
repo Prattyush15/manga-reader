@@ -33,7 +33,7 @@ interface MangaDexManga {
   relationships: MangaDexRelationship[]
 }
 
-interface MangaDxChapterData {
+interface MangaDexChapterData {
   id: string
   attributes: {
     chapter?: string
@@ -43,8 +43,8 @@ interface MangaDxChapterData {
   }
 }
 
-interface MangaDxChapterResponse {
-  data: MangaDxChapterData[]
+interface MangaDexChapterResponse {
+  data: MangaDexChapterData[]
   total: number
 }
 
@@ -83,7 +83,7 @@ export async function fetchMangaChapters(mangaId: string): Promise<Chapter[]> {
   
   let url: string
   if (isServer) {
-    // Server-side: use direct MangaDx API call
+    // Server-side: use direct MangaDex API call
     try {
       let chapters: Chapter[] = []
       let offset = 0
@@ -106,18 +106,18 @@ export async function fetchMangaChapters(mangaId: string): Promise<Chapter[]> {
           throw new Error(`MangaDex API responded with status: ${response.status}`)
         }
 
-        const data: MangaDxChapterResponse = await response.json()
+        const data: MangaDexChapterResponse = await response.json()
         if (!data.data) break
 
         // Only include English chapters with a chapter number and with pages
         const batch = data.data
-          .filter((c: MangaDxChapterData) =>
+          .filter((c: MangaDexChapterData) =>
             c.attributes &&
             c.attributes.chapter &&
             c.attributes.translatedLanguage?.includes('en') &&
             c.attributes.pages && c.attributes.pages > 0
           )
-          .map((c: MangaDxChapterData) => ({
+          .map((c: MangaDexChapterData) => ({
             id: c.id,
             title: c.attributes.title || `Chapter ${c.attributes.chapter}`,
             chapter: c.attributes.chapter as string,
