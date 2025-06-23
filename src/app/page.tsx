@@ -164,7 +164,7 @@ export default function Home() {
                 <>
                   Search Results 
                   <span className="text-lg font-normal text-gray-400 ml-2">
-                    for "{search}"
+                    for &quot;{search}&quot;
                   </span>
                 </>
               ) : (
@@ -228,7 +228,7 @@ export default function Home() {
                 {search.trim() ? (
                   <>
                     <div className="text-6xl mb-4">🔍</div>
-                    <p>No manga found for "{search}"</p>
+                    <p>No manga found for &quot;{search}&quot;</p>
                     <p className="text-sm mt-2">Try a different search term</p>
                   </>
                 ) : (

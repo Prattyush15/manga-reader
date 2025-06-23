@@ -31,10 +31,20 @@ const FEATURED_MANGA = [
     preferred: 'Eyeshield 21',
     searchTerms: ['Eyeshield 21'],
     excludeTerms: ['Brain x Brave', 'side story', 'special']
+  },
+  {
+    preferred: 'Mairimashita! Iruma-kun',
+    searchTerms: ['Mairimashita! Iruma-kun', 'Welcome to Demon School! Iruma-kun'],
+    excludeTerms: ['side story', 'spin-off', 'special']
+  },
+  {
+    preferred: 'Omniscient Reader\'s Viewpoint',
+    searchTerms: ['Omniscient Reader\'s Viewpoint', 'Omniscient Reader', 'ORV'],
+    excludeTerms: ['side story', 'spin-off', 'novel']
   }
 ]
 
-interface MangaDexManga {
+interface MangaDxManga {
   id: string
   attributes: {
     title: { en?: string, [key: string]: string | undefined }
@@ -52,7 +62,7 @@ interface MangaDexManga {
 
 export async function GET() {
   try {
-    const featuredManga: MangaDexManga[] = []
+    const featuredManga: MangaDxManga[] = []
 
     for (const manga of FEATURED_MANGA) {
       let found = false
@@ -63,11 +73,12 @@ export async function GET() {
         
         try {
           const response = await fetch(
-            `https://api.mangadex.org/manga?title=${encodeURIComponent(searchTerm)}&limit=15&includes[]=cover_art&availableTranslatedLanguage[]=en`,
+            `https://api.mangadex.org/manga?title=${encodeURIComponent(searchTerm)}&limit=10&includes[]=cover_art&availableTranslatedLanguage[]=en`,
             {
               headers: {
                 'User-Agent': 'MangaReader/1.0',
               },
+              signal: AbortSignal.timeout(8000), // 8 second timeout per request
             }
           )
 
@@ -111,10 +122,11 @@ export async function GET() {
           }
         } catch (error) {
           console.error(`Error fetching ${searchTerm}:`, error)
+          // Continue to next search term instead of failing completely
         }
       }
       
-      // If still not found, log it
+      // If still not found, log it but don't break the whole request
       if (!found) {
         console.log(`Could not find manga: ${manga.preferred}`)
       }

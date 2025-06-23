@@ -110,40 +110,52 @@ export default function BrowsePage() {
     setError('')
     
     const params = new URLSearchParams()
-    params.set('limit', '18')
+    params.set('limit', '8')
     if (search) params.set('query', search)
     selectedGenres.forEach((id) => params.append('genre', id))
     
-    fetch(`/api/manga?${params.toString()}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.error) {
-          throw new Error(data.error)
-        }
-        
-        if (data.data) {
-          setMangaResults(
-            data.data.map((m: MangaDexManga) => {
-              const coverFile = m.relationships.find((r: MangaDexRelationship) => r.type === 'cover_art')?.attributes?.fileName
-              return {
-                id: m.id,
-                title: m.attributes.title.en || Object.values(m.attributes.title)[0] || 'Untitled',
-                coverImage: coverFile
-                  ? `https://uploads.mangadex.org/covers/${m.id}/${coverFile}.256.jpg`
-                  : '',
-                description: m.attributes.description.en || '',
-                mangaPlusUrl: m.attributes.mangaPlusUrl
-              }
-            })
-          )
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        console.error('Fetch error:', error)
-        setError('Failed to fetch manga. Please try again.')
-        setLoading(false)
-      })
+    // Add a small delay to debounce rapid changes
+    const timeoutId = setTimeout(() => {
+      fetch(`/api/manga?${params.toString()}`)
+        .then(res => {
+          if (!res.ok) {
+            throw new Error(`HTTP ${res.status}`)
+          }
+          return res.json()
+        })
+        .then(data => {
+          if (data.error) {
+            throw new Error(data.error)
+          }
+          
+          if (data.data) {
+            setMangaResults(
+              data.data.map((m: MangaDexManga) => {
+                const coverFile = m.relationships.find((r: MangaDexRelationship) => r.type === 'cover_art')?.attributes?.fileName
+                return {
+                  id: m.id,
+                  title: m.attributes.title.en || Object.values(m.attributes.title)[0] || 'Untitled',
+                  coverImage: coverFile
+                    ? `https://uploads.mangadex.org/covers/${m.id}/${coverFile}.256.jpg`
+                    : '',
+                  description: m.attributes.description.en || '',
+                  mangaPlusUrl: m.attributes.mangaPlusUrl
+                }
+              }).filter((m: Manga) => m.coverImage && m.title && m.description)
+            )
+          } else {
+            setMangaResults([])
+          }
+          setLoading(false)
+        })
+        .catch((error) => {
+          console.error('Fetch error:', error)
+          setError('Failed to fetch manga. Please try again.')
+          setLoading(false)
+        })
+    }, search ? 300 : 0) // Debounce search but load immediately for genre changes
+    
+    return () => clearTimeout(timeoutId)
   }, [search, selectedGenres])
 
   const handleGenreChange = (id: string) => {

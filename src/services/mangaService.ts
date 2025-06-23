@@ -33,6 +33,21 @@ interface MangaDexManga {
   relationships: MangaDexRelationship[]
 }
 
+interface MangaDxChapterData {
+  id: string
+  attributes: {
+    chapter?: string
+    title?: string
+    translatedLanguage?: string[]
+    pages?: number
+  }
+}
+
+interface MangaDxChapterResponse {
+  data: MangaDxChapterData[]
+  total: number
+}
+
 export async function fetchMangaList(query?: string): Promise<Manga[]> {
   const params = new URLSearchParams()
   params.set('limit', '12')
@@ -63,14 +78,91 @@ export async function fetchMangaList(query?: string): Promise<Manga[]> {
 }
 
 export async function fetchMangaChapters(mangaId: string): Promise<Chapter[]> {
-  const res = await fetch(`/api/manga/${mangaId}/chapters`)
-  const data = await res.json()
+  // Check if we're on the server (no window object) or client
+  const isServer = typeof window === 'undefined'
   
-  if (data.error) {
-    throw new Error(data.error)
+  let url: string
+  if (isServer) {
+    // Server-side: use direct MangaDx API call
+    try {
+      let chapters: Chapter[] = []
+      let offset = 0
+      let hasMore = true
+      const limit = 100
+
+      // Fetch up to 5000 chapters (in batches of 100)
+      while (hasMore && offset < 5000) {
+        const response = await fetch(
+          `https://api.mangadex.org/manga/${mangaId}/feed?limit=${limit}&offset=${offset}&translatedLanguage[]=en&order[chapter]=asc`,
+          {
+            headers: {
+              'User-Agent': 'MangaReader/1.0',
+            },
+            cache: 'no-store'
+          }
+        )
+
+        if (!response.ok) {
+          throw new Error(`MangaDex API responded with status: ${response.status}`)
+        }
+
+        const data: MangaDxChapterResponse = await response.json()
+        if (!data.data) break
+
+        // Only include English chapters with a chapter number and with pages
+        const batch = data.data
+          .filter((c: MangaDxChapterData) =>
+            c.attributes &&
+            c.attributes.chapter &&
+            c.attributes.translatedLanguage?.includes('en') &&
+            c.attributes.pages && c.attributes.pages > 0
+          )
+          .map((c: MangaDxChapterData) => ({
+            id: c.id,
+            title: c.attributes.title || `Chapter ${c.attributes.chapter}`,
+            chapter: c.attributes.chapter as string,
+            pages: c.attributes.pages || 0,
+          }))
+
+        chapters = chapters.concat(batch)
+        hasMore = data.total > offset + data.data.length
+        offset += data.data.length
+        if (data.data.length < limit) break
+      }
+
+      // Deduplicate by chapter number, keep the one with the most pages
+      const deduped: { [chapter: string]: Chapter } = {}
+      for (const ch of chapters) {
+        if (!ch.chapter) continue
+        if (!deduped[ch.chapter] || (ch.pages || 0) > (deduped[ch.chapter].pages || 0)) {
+          deduped[ch.chapter] = ch
+        }
+      }
+
+      // Sort by chapter number (as float)
+      return Object.values(deduped).sort((a, b) => parseFloat(a.chapter) - parseFloat(b.chapter))
+    } catch (error) {
+      console.error('Error fetching chapters server-side:', error)
+      return []
+    }
+  } else {
+    // Client-side: use our API route
+    url = `/api/manga/${mangaId}/chapters`
+    
+    try {
+      const res = await fetch(url)
+      const data = await res.json()
+      
+      if (data.error) {
+        throw new Error(data.error)
+      }
+      
+      return data.chapters || []
+    } catch (error) {
+      console.error('Error fetching chapters client-side:', error)
+      return []
+    }
   }
-  
-  return data.chapters || []
 }
 
 export async function fetchChapterPages(chapterId: string): Promise<string[]> {
